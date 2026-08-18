@@ -1,0 +1,2372 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Absensi Sholat - Pondok Pesantren Seribu Bulan</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --primary: #166534;
+    --primary2: #15803d;
+    --bg: #f3f6f4;
+    --card: #ffffff;
+    --text: #17201a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --danger: #dc2626;
+    --warning: #d97706;
+    --info: #2563eb;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* SIDEBAR */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    background: linear-gradient(180deg, #14532d, #166534);
+    color: white;
+    padding: 20px 15px;
+    z-index: 1000;
+}
+
+.logo {
+    text-align: center;
+    padding: 10px 5px 25px;
+}
+
+.logo .icon {
+    font-size: 42px;
+}
+
+.logo h2 {
+    font-size: 18px;
+    margin-top: 8px;
+}
+
+.logo p {
+    font-size: 12px;
+    opacity: .8;
+    margin-top: 4px;
+}
+
+.menu {
+    margin-top: 15px;
+}
+
+.menu button {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: white;
+    padding: 13px 15px;
+    margin-bottom: 6px;
+    border-radius: 10px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    transition: .2s;
+}
+
+.menu button:hover,
+.menu button.active {
+    background: rgba(255,255,255,.15);
+}
+
+.menu button span {
+    margin-right: 10px;
+}
+
+/* MAIN */
+.main {
+    margin-left: 250px;
+    min-height: 100vh;
+}
+
+.topbar {
+    height: 70px;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    position: sticky;
+    top: 0;
+    z-index: 500;
+}
+
+.topbar h1 {
+    font-size: 20px;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.connection {
+    font-size: 12px;
+    padding: 7px 10px;
+    border-radius: 20px;
+    background: #dcfce7;
+    color: #166534;
+}
+
+.content {
+    padding: 25px;
+}
+
+/* PAGE */
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.page-title {
+    margin-bottom: 20px;
+}
+
+.page-title h2 {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.page-title p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* STAT CARDS */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.03);
+}
+
+.stat-card .stat-icon {
+    font-size: 25px;
+    margin-bottom: 10px;
+}
+
+.stat-card h3 {
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.stat-card p {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* CARDS */
+.card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.card-header h3 {
+    font-size: 17px;
+}
+
+/* GRID */
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* BUTTON */
+.btn {
+    border: 0;
+    padding: 10px 15px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary2);
+}
+
+.btn-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* FORM */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    outline: none;
+    background: white;
+}
+
+input:focus,
+select:focus {
+    border-color: var(--primary);
+}
+
+/* ABSENSI */
+.absensi-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-box input {
+    padding-left: 40px;
+}
+
+.search-box .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 11px;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    border: 1px solid var(--border);
+    background: white;
+    padding: 8px 13px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.filter-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* TABLE */
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-size: 13px;
+}
+
+th {
+    background: #f8faf9;
+    font-size: 12px;
+    color: #4b5563;
+}
+
+.badge {
+    display: inline-block;
+    padding: 5px 8px;
+    border-radius: 15px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge-putra {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.badge-putri {
+    background: #fce7f3;
+    color: #be185d;
+}
+
+/* STATUS BUTTON */
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 7px;
+}
+
+.status-btn {
+    border: 1px solid var(--border);
+    padding: 9px 5px;
+    border-radius: 8px;
+    cursor: pointer;
+    background: white;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-btn.selected {
+    outline: 2px solid var(--primary);
+    background: #ecfdf5;
+}
+
+.status-jamaah {
+    color: #15803d;
+}
+
+.status-masbuk {
+    color: #ca8a04;
+}
+
+.status-terlambat {
+    color: #ea580c;
+}
+
+.status-izin {
+    color: #2563eb;
+}
+
+.status-alpa {
+    color: #dc2626;
+}
+
+/* PROGRESS */
+.progress {
+    height: 9px;
+    width: 100%;
+    background: #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 20px;
+}
+
+/* PROFILE */
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: #dcfce7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 25px;
+}
+
+.profile h3 {
+    margin-bottom: 5px;
+}
+
+/* DETAIL STAT */
+.detail-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+.detail-stat {
+    text-align: center;
+    padding: 15px 8px;
+    border-radius: 10px;
+    background: #f8faf9;
+}
+
+.detail-stat strong {
+    display: block;
+    font-size: 23px;
+    margin-bottom: 5px;
+}
+
+.detail-stat small {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+/* MODAL */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    padding: 20px;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 450px;
+    border-radius: 15px;
+    padding: 22px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.close {
+    border: 0;
+    background: transparent;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+/* TOAST */
+.toast {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    background: #17201a;
+    color: white;
+    padding: 13px 18px;
+    border-radius: 10px;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    transition: .3s;
+    z-index: 5000;
+    font-size: 13px;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* MOBILE */
+.mobile-menu {
+    display: none;
+    border: 0;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+@media(max-width: 1000px) {
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width: 750px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: .3s;
+    }
+
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    .main {
+        margin-left: 0;
+    }
+
+    .mobile-menu {
+        display: block;
+    }
+
+    .topbar {
+        padding: 0 15px;
+    }
+
+    .content {
+        padding: 15px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .absensi-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .status-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .detail-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 450px) {
+    .stats {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+
+    <div class="logo">
+        <div class="icon">🕌</div>
+        <h2>Seribu Bulan</h2>
+        <p>Absensi Sholat Santri</p>
+    </div>
+
+    <div class="menu">
+
+        <button class="active" onclick="showPage('dashboard', this)">
+            <span>📊</span> Dashboard
+        </button>
+
+        <button onclick="showPage('absensi', this)">
+            <span>🕌</span> Absensi Sholat
+        </button>
+
+        <button onclick="showPage('santri', this)">
+            <span>👥</span> Data Santri
+        </button>
+
+        <button onclick="showPage('statistik', this)">
+            <span>📈</span> Statistik
+        </button>
+
+    </div>
+
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+    <header class="topbar">
+
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button class="mobile-menu" onclick="toggleSidebar()">☰</button>
+
+            <div>
+                <h1 id="topTitle">Dashboard</h1>
+            </div>
+        </div>
+
+        <div class="topbar-right">
+            <div class="connection" id="connectionStatus">
+                🟢 Firebase
+            </div>
+        </div>
+
+    </header>
+
+    <div class="content">
+
+        <!-- ================= DASHBOARD ================= -->
+
+        <section class="page active" id="dashboard">
+
+            <div class="page-title">
+                <h2>Dashboard</h2>
+                <p>Ringkasan absensi sholat Pondok Pesantren Seribu Bulan</p>
+            </div>
+
+            <div class="stats">
+
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <h3 id="totalSantri">0</h3>
+                    <p>Total Santri</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">👨</div>
+                    <h3 id="totalPutra">0</h3>
+                    <p>Santri Putra</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">👩</div>
+                    <h3 id="totalPutri">0</h3>
+                    <p>Santri Putri</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🕌</div>
+                    <h3 id="totalJamaah">0</h3>
+                    <p>Berjamaah Hari Ini</p>
+                </div>
+
+            </div>
+
+            <div class="grid-2">
+
+                <div class="card">
+
+                    <div class="card-header">
+                        <h3>📅 Absensi Hari Ini</h3>
+
+                        <input
+                            type="date"
+                            id="dashboardDate"
+                            style="width:160px;"
+                            onchange="loadDashboard()"
+                        >
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Jumlah</th>
+                                    <th>Persentase</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+                                    <td>🕌 Berjamaah</td>
+                                    <td id="dashJamaah">0</td>
+                                    <td id="dashJamaahPct">0%</td>
+                                </tr>
+
+                                <tr>
+                                    <td>🟡 Masbuk</td>
+                                    <td id="dashMasbuk">0</td>
+                                    <td id="dashMasbukPct">0%</td>
+                                </tr>
+
+                                <tr>
+                                    <td>🟠 Terlambat</td>
+                                    <td id="dashTerlambat">0</td>
+                                    <td id="dashTerlambatPct">0%</td>
+                                </tr>
+
+                                <tr>
+                                    <td>🔵 Izin</td>
+                                    <td id="dashIzin">0</td>
+                                    <td id="dashIzinPct">0%</td>
+                                </tr>
+
+                                <tr>
+                                    <td>🔴 Alpa</td>
+                                    <td id="dashAlpa">0</td>
+                                    <td id="dashAlpaPct">0%</td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-header">
+                        <h3>🕌 Statistik Sholat</h3>
+                    </div>
+
+                    <div id="dashboardPrayerStats"></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= ABSENSI ================= -->
+
+        <section class="page" id="absensi">
+
+            <div class="page-title">
+                <h2>Absensi Sholat</h2>
+                <p>Catat kehadiran sholat santri</p>
+            </div>
+
+            <div class="card">
+
+                <div class="absensi-controls">
+
+                    <div class="form-group">
+                        <label>Tanggal</label>
+
+                        <input
+                            type="date"
+                            id="tanggalAbsensi"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label>Sholat</label>
+
+                        <select id="sholatAbsensi">
+
+                            <option value="subuh">Subuh</option>
+                            <option value="dzuhur">Dzuhur</option>
+                            <option value="ashar">Ashar</option>
+                            <option value="maghrib">Maghrib</option>
+                            <option value="isya">Isya</option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
+
+                    <div class="search-box" style="width:300px;max-width:100%;">
+
+                        <span class="search-icon">🔎</span>
+
+                        <input
+                            type="text"
+                            id="searchAbsensi"
+                            placeholder="Cari nama santri..."
+                            oninput="renderAbsensi()"
+                        >
+
+                    </div>
+
+                    <div class="filter-buttons">
+
+                        <button
+                            class="filter-btn active"
+                            onclick="setGenderFilter('semua', this)"
+                        >
+                            Semua
+                        </button>
+
+                        <button
+                            class="filter-btn"
+                            onclick="setGenderFilter('Putra', this)"
+                        >
+                            👨 Putra
+                        </button>
+
+                        <button
+                            class="filter-btn"
+                            onclick="setGenderFilter('Putri', this)"
+                        >
+                            👩 Putri
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Santri</th>
+                                <th>Jenis</th>
+                                <th style="min-width:330px;">Status Kehadiran</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="absensiList">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= SANTRI ================= -->
+
+        <section class="page" id="santri">
+
+            <div class="page-title">
+
+                <h2>Data Santri</h2>
+
+                <p>
+                    Data santri hanya menggunakan nama dan jenis kelamin.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h3>👥 Daftar Santri</h3>
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="openSantriModal()"
+                    >
+                        + Tambah Santri
+                    </button>
+
+                </div>
+
+
+                <div style="margin-bottom:15px;">
+
+                    <div class="search-box" style="max-width:400px;">
+
+                        <span class="search-icon">🔎</span>
+
+                        <input
+                            type="text"
+                            id="searchSantri"
+                            placeholder="Cari nama santri..."
+                            oninput="renderSantri()"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>No</th>
+                                <th>Nama</th>
+                                <th>Jenis Kelamin</th>
+                                <th>Aksi</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="santriList">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= STATISTIK ================= -->
+
+        <section class="page" id="statistik">
+
+            <div class="page-title">
+
+                <h2>Statistik Santri</h2>
+
+                <p>
+                    Cari nama santri untuk melihat seluruh riwayat absensinya.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="search-box" style="max-width:500px;">
+
+                    <span class="search-icon">🔎</span>
+
+                    <input
+                        type="text"
+                        id="searchStatistik"
+                        placeholder="Ketik nama santri..."
+                        oninput="renderStatistik()"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div id="statistikResult">
+
+                <div class="card">
+
+                    <div style="text-align:center;padding:30px;color:#6b7280;">
+
+                        🔎 Cari nama santri untuk melihat statistik.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<!-- MODAL TAMBAH SANTRI -->
+
+<div class="modal" id="santriModal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h3>Tambah Santri</h3>
+
+            <button class="close" onclick="closeSantriModal()">×</button>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Nama Santri</label>
+
+            <input
+                type="text"
+                id="namaSantri"
+                placeholder="Masukkan nama lengkap"
+            >
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Jenis Kelamin</label>
+
+            <select id="jenisKelamin">
+
+                <option value="Putra">Putra</option>
+                <option value="Putri">Putri</option>
+
+            </select>
+
+        </div>
+
+        <button
+            class="btn btn-primary"
+            style="width:100%;"
+            onclick="tambahSantri()"
+        >
+            Simpan Santri
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div class="toast" id="toast"></div>
+
+
+<script type="module">
+
+/* ============================================================
+   FIREBASE
+============================================================ */
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+import {
+    getDatabase,
+    ref,
+    push,
+    set,
+    get,
+    remove
+}
+from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
+
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyDqi8CPibuJQJbeU0I7Ji3283Q5g-Zjbo0",
+
+    authDomain: "absen-c458c.firebaseapp.com",
+
+    databaseURL:
+    "https://absen-c458c-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+    projectId: "absen-c458c",
+
+    storageBucket:
+    "absen-c458c.firebasestorage.app",
+
+    messagingSenderId: "6019525143",
+
+    appId:
+    "1:6019525143:web:832773386ac201edbc4a52",
+
+    measurementId: "G-5R4RHFVY2D"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getDatabase(app);
+
+
+/* ============================================================
+   DATA GLOBAL
+============================================================ */
+
+let santriData = {};
+
+let absensiData = {};
+
+let genderFilter = "semua";
+
+let selectedStatuses = {};
+
+
+/* ============================================================
+   HELPER
+============================================================ */
+
+function today() {
+
+    const d = new Date();
+
+    const year = d.getFullYear();
+
+    const month =
+        String(d.getMonth() + 1).padStart(2, "0");
+
+    const day =
+        String(d.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+function showToast(message) {
+
+    const toast =
+        document.getElementById("toast");
+
+    toast.textContent = message;
+
+    toast.classList.add("show");
+
+    setTimeout(() => {
+
+        toast.classList.remove("show");
+
+    }, 2500);
+
+}
+
+
+/* ============================================================
+   LOAD DATABASE
+============================================================ */
+
+async function loadAllData() {
+
+    try {
+
+        const santriSnapshot =
+            await get(ref(db, "santri"));
+
+        const absensiSnapshot =
+            await get(ref(db, "absensi"));
+
+        santriData =
+            santriSnapshot.exists()
+            ? santriSnapshot.val()
+            : {};
+
+        absensiData =
+            absensiSnapshot.exists()
+            ? absensiSnapshot.val()
+            : {};
+
+        document.getElementById("connectionStatus").textContent =
+            "🟢 Terhubung";
+
+        renderSantri();
+
+        renderAbsensi();
+
+        loadDashboard();
+
+        renderStatistik();
+
+    } catch(error) {
+
+        console.error(error);
+
+        document.getElementById("connectionStatus").textContent =
+            "🔴 Error Firebase";
+
+        showToast(
+            "Gagal mengambil data Firebase"
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+
+window.showPage = function(page, button) {
+
+    document
+        .querySelectorAll(".page")
+        .forEach(p => p.classList.remove("active"));
+
+    document
+        .getElementById(page)
+        .classList.add("active");
+
+
+    document
+        .querySelectorAll(".menu button")
+        .forEach(b => b.classList.remove("active"));
+
+    button.classList.add("active");
+
+
+    const titles = {
+
+        dashboard: "Dashboard",
+
+        absensi: "Absensi Sholat",
+
+        santri: "Data Santri",
+
+        statistik: "Statistik"
+
+    };
+
+    document.getElementById("topTitle").textContent =
+        titles[page];
+
+    document
+        .getElementById("sidebar")
+        .classList.remove("show");
+
+};
+
+
+window.toggleSidebar = function() {
+
+    document
+        .getElementById("sidebar")
+        .classList.toggle("show");
+
+};
+
+
+/* ============================================================
+   SANTRI
+============================================================ */
+
+window.openSantriModal = function() {
+
+    document
+        .getElementById("santriModal")
+        .classList.add("show");
+
+    document
+        .getElementById("namaSantri")
+        .focus();
+
+};
+
+
+window.closeSantriModal = function() {
+
+    document
+        .getElementById("santriModal")
+        .classList.remove("show");
+
+    document
+        .getElementById("namaSantri")
+        .value = "";
+
+};
+
+
+window.tambahSantri = async function() {
+
+    const nama =
+        document
+        .getElementById("namaSantri")
+        .value
+        .trim();
+
+    const jenisKelamin =
+        document
+        .getElementById("jenisKelamin")
+        .value;
+
+
+    if(!nama) {
+
+        showToast("Nama santri belum diisi");
+
+        return;
+
+    }
+
+
+    try {
+
+        const newSantri =
+            push(ref(db, "santri"));
+
+        await set(newSantri, {
+
+            nama: nama,
+
+            jenisKelamin: jenisKelamin
+
+        });
+
+
+        showToast("Santri berhasil ditambahkan");
+
+        closeSantriModal();
+
+        await loadAllData();
+
+    } catch(error) {
+
+        console.error(error);
+
+        showToast("Gagal menyimpan santri");
+
+    }
+
+};
+
+
+window.hapusSantri = async function(id) {
+
+    const santri = santriData[id];
+
+    if(!santri) return;
+
+
+    const yakin =
+        confirm(
+            `Hapus santri "${santri.nama}"?`
+        );
+
+
+    if(!yakin) return;
+
+
+    try {
+
+        await remove(
+            ref(db, "santri/" + id)
+        );
+
+        showToast("Santri berhasil dihapus");
+
+        await loadAllData();
+
+    } catch(error) {
+
+        console.error(error);
+
+        showToast("Gagal menghapus santri");
+
+    }
+
+};
+
+
+window.renderSantri = function() {
+
+    const tbody =
+        document.getElementById("santriList");
+
+    const search =
+        document
+        .getElementById("searchSantri")
+        .value
+        .toLowerCase();
+
+
+    tbody.innerHTML = "";
+
+
+    const list =
+        Object.entries(santriData)
+        .filter(([id, santri]) => {
+
+            return santri.nama
+                .toLowerCase()
+                .includes(search);
+
+        });
+
+
+    if(list.length === 0) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td colspan="4"
+                    style="text-align:center;padding:30px;color:#6b7280;">
+
+                    Belum ada data santri.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    list.forEach(([id, santri], index) => {
+
+        const badge =
+            santri.jenisKelamin === "Putra"
+            ? "badge-putra"
+            : "badge-putri";
+
+
+        tbody.innerHTML += `
+
+            <tr>
+
+                <td>${index + 1}</td>
+
+                <td>
+                    <strong>${escapeHtml(santri.nama)}</strong>
+                </td>
+
+                <td>
+
+                    <span class="badge ${badge}">
+
+                        ${santri.jenisKelamin === "Putra" ? "👨" : "👩"}
+
+                        ${santri.jenisKelamin}
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <button
+                        class="btn btn-danger"
+                        onclick="hapusSantri('${id}')"
+                    >
+
+                        Hapus
+
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+};
+
+
+/* ============================================================
+   FILTER
+============================================================ */
+
+window.setGenderFilter = function(gender, button) {
+
+    genderFilter = gender;
+
+
+    document
+        .querySelectorAll(".filter-btn")
+        .forEach(b => b.classList.remove("active"));
+
+    button.classList.add("active");
+
+
+    renderAbsensi();
+
+};
+
+
+/* ============================================================
+   ABSENSI
+============================================================ */
+
+function getAbsensiStatus(
+    tanggal,
+    sholat,
+    santriId
+) {
+
+    return (
+        absensiData?.[tanggal]?.[sholat]?.[santriId]
+        || ""
+    );
+
+}
+
+
+window.renderAbsensi = function() {
+
+    const tbody =
+        document.getElementById("absensiList");
+
+    const tanggal =
+        document.getElementById("tanggalAbsensi").value;
+
+    const sholat =
+        document.getElementById("sholatAbsensi").value;
+
+    const search =
+        document.getElementById("searchAbsensi")
+        .value
+        .toLowerCase();
+
+
+    tbody.innerHTML = "";
+
+
+    const list =
+        Object.entries(santriData)
+        .filter(([id, santri]) => {
+
+            const genderMatch =
+                genderFilter === "semua"
+                || santri.jenisKelamin === genderFilter;
+
+            const searchMatch =
+                santri.nama
+                .toLowerCase()
+                .includes(search);
+
+            return genderMatch && searchMatch;
+
+        })
+        .sort((a,b) =>
+            a[1].nama.localeCompare(
+                b[1].nama,
+                "id"
+            )
+        );
+
+
+    if(list.length === 0) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td colspan="4"
+                    style="text-align:center;padding:30px;">
+
+                    Data santri tidak ditemukan.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    list.forEach(([id, santri], index) => {
+
+        const status =
+            getAbsensiStatus(
+                tanggal,
+                sholat,
+                id
+            );
+
+
+        tbody.innerHTML += `
+
+            <tr>
+
+                <td>${index + 1}</td>
+
+                <td>
+                    <strong>
+                        ${escapeHtml(santri.nama)}
+                    </strong>
+                </td>
+
+                <td>
+
+                    <span class="badge ${
+                        santri.jenisKelamin === "Putra"
+                        ? "badge-putra"
+                        : "badge-putri"
+                    }">
+
+                        ${santri.jenisKelamin === "Putra" ? "👨" : "👩"}
+
+                        ${santri.jenisKelamin}
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <div class="status-grid">
+
+                        ${statusButton(
+                            id,
+                            "berjamaah",
+                            "🕌",
+                            "Jamaah",
+                            status
+                        )}
+
+                        ${statusButton(
+                            id,
+                            "masbuk",
+                            "🟡",
+                            "Masbuk",
+                            status
+                        )}
+
+                        ${statusButton(
+                            id,
+                            "terlambat",
+                            "🟠",
+                            "Telat",
+                            status
+                        )}
+
+                        ${statusButton(
+                            id,
+                            "izin",
+                            "🔵",
+                            "Izin",
+                            status
+                        )}
+
+                        ${statusButton(
+                            id,
+                            "alpa",
+                            "🔴",
+                            "Alpa",
+                            status
+                        )}
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+};
+
+
+function statusButton(
+    id,
+    value,
+    icon,
+    label,
+    current
+) {
+
+    return `
+
+        <button
+            class="status-btn status-${value} ${
+                current === value
+                ? "selected"
+                : ""
+            }"
+            onclick="setAbsensi('${id}', '${value}')"
+        >
+
+            ${icon} ${label}
+
+        </button>
+
+    `;
+
+}
+
+
+window.setAbsensi = async function(
+    santriId,
+    status
+) {
+
+    const tanggal =
+        document.getElementById("tanggalAbsensi").value;
+
+    const sholat =
+        document.getElementById("sholatAbsensi").value;
+
+
+    if(!tanggal || !sholat) {
+
+        showToast("Tanggal dan sholat harus dipilih");
+
+        return;
+
+    }
+
+
+    try {
+
+        await set(
+
+            ref(
+                db,
+                `absensi/${tanggal}/${sholat}/${santriId}`
+            ),
+
+            status
+
+        );
+
+
+        if(!absensiData[tanggal]) {
+
+            absensiData[tanggal] = {};
+
+        }
+
+        if(!absensiData[tanggal][sholat]) {
+
+            absensiData[tanggal][sholat] = {};
+
+        }
+
+
+        absensiData[tanggal][sholat][santriId] =
+            status;
+
+
+        renderAbsensi();
+
+        loadDashboard();
+
+        showToast("Absensi tersimpan");
+
+    } catch(error) {
+
+        console.error(error);
+
+        showToast("Gagal menyimpan absensi");
+
+    }
+
+};
+
+
+/* ============================================================
+   DASHBOARD
+============================================================ */
+
+window.loadDashboard = function() {
+
+    const tanggal =
+        document.getElementById("dashboardDate").value;
+
+
+    const total =
+        Object.keys(santriData).length;
+
+
+    let putra = 0;
+
+    let putri = 0;
+
+
+    Object.values(santriData)
+    .forEach(s => {
+
+        if(s.jenisKelamin === "Putra")
+            putra++;
+
+        if(s.jenisKelamin === "Putri")
+            putri++;
+
+    });
+
+
+    document.getElementById("totalSantri").textContent =
+        total;
+
+    document.getElementById("totalPutra").textContent =
+        putra;
+
+    document.getElementById("totalPutri").textContent =
+        putri;
+
+
+    const stats = {
+
+        berjamaah: 0,
+
+        masbuk: 0,
+
+        terlambat: 0,
+
+        izin: 0,
+
+        alpa: 0
+
+    };
+
+
+    const prayerStats = {
+
+        subuh: 0,
+
+        dzuhur: 0,
+
+        ashar: 0,
+
+        maghrib: 0,
+
+        isya: 0
+
+    };
+
+
+    if(absensiData[tanggal]) {
+
+        Object.entries(
+            absensiData[tanggal]
+        )
+        .forEach(([sholat, data]) => {
+
+            Object.values(data || {})
+            .forEach(status => {
+
+                if(stats[status] !== undefined) {
+
+                    stats[status]++;
+
+                }
+
+            });
+
+
+            prayerStats[sholat] =
+                Object.keys(data || {}).length;
+
+        });
+
+    }
+
+
+    document.getElementById("totalJamaah").textContent =
+        stats.berjamaah;
+
+
+    document.getElementById("dashJamaah").textContent =
+        stats.berjamaah;
+
+    document.getElementById("dashMasbuk").textContent =
+        stats.masbuk;
+
+    document.getElementById("dashTerlambat").textContent =
+        stats.terlambat;
+
+    document.getElementById("dashIzin").textContent =
+        stats.izin;
+
+    document.getElementById("dashAlpa").textContent =
+        stats.alpa;
+
+
+    const totalAbsensi =
+        Object.values(stats)
+        .reduce(
+            (a,b) => a+b,
+            0
+        );
+
+
+    setPercentage(
+        "dashJamaahPct",
+        stats.berjamaah,
+        totalAbsensi
+    );
+
+    setPercentage(
+        "dashMasbukPct",
+        stats.masbuk,
+        totalAbsensi
+    );
+
+    setPercentage(
+        "dashTerlambatPct",
+        stats.terlambat,
+        totalAbsensi
+    );
+
+    setPercentage(
+        "dashIzinPct",
+        stats.izin,
+        totalAbsensi
+    );
+
+    setPercentage(
+        "dashAlpaPct",
+        stats.alpa,
+        totalAbsensi
+    );
+
+
+    const container =
+        document.getElementById(
+            "dashboardPrayerStats"
+        );
+
+
+    const prayerNames = {
+
+        subuh: "Subuh",
+
+        dzuhur: "Dzuhur",
+
+        ashar: "Ashar",
+
+        maghrib: "Maghrib",
+
+        isya: "Isya"
+
+    };
+
+
+    container.innerHTML = "";
+
+
+    Object.entries(prayerStats)
+    .forEach(([key, value]) => {
+
+        container.innerHTML += `
+
+            <div style="margin-bottom:15px;">
+
+                <div style="display:flex;justify-content:space-between;font-size:13px;">
+
+                    <strong>
+                        ${prayerNames[key]}
+                    </strong>
+
+                    <span>
+                        ${value} absensi
+                    </span>
+
+                </div>
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        style="width:${
+                            total > 0
+                            ? Math.min(
+                                100,
+                                (value / total) * 100
+                            )
+                            : 0
+                        }%;"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+};
+
+
+function setPercentage(
+    elementId,
+    value,
+    total
+) {
+
+    document.getElementById(elementId)
+    .textContent =
+        total > 0
+        ? Math.round(
+            (value / total) * 100
+          ) + "%"
+        : "0%";
+
+}
+
+
+/* ============================================================
+   STATISTIK INDIVIDU
+============================================================ */
+
+window.renderStatistik = function() {
+
+    const keyword =
+        document
+        .getElementById("searchStatistik")
+        .value
+        .toLowerCase()
+        .trim();
+
+
+    const container =
+        document.getElementById(
+            "statistikResult"
+        );
+
+
+    if(!keyword) {
+
+        container.innerHTML = `
+
+            <div class="card">
+
+                <div style="text-align:center;padding:30px;color:#6b7280;">
+
+                    🔎 Cari nama santri untuk melihat statistik.
+
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    const found =
+        Object.entries(santriData)
+        .filter(([id, santri]) =>
+            santri.nama
+            .toLowerCase()
+            .includes(keyword)
+        );
+
+
+    if(found.length === 0) {
+
+        container.innerHTML = `
+
+            <div class="card">
+
+                <div style="text-align:center;padding:30px;color:#6b7280;">
+
+                    Santri tidak ditemukan.
+
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML = "";
+
+
+    found.forEach(([id, santri]) => {
+
+        const stats =
+            calculateSantriStats(id);
+
+
+        const total =
+            Object.values(stats)
+            .reduce(
+                (a,b) => a+b,
+                0
+            );
+
+
+        const percentage =
+            total > 0
+            ? Math.round(
+                (
+                    stats.berjamaah
+                    / total
+                ) * 100
+              )
+            : 0;
+
+
+        container.innerHTML += `
+
+            <div class="card">
+
+                <div class="profile">
+
+                    <div class="avatar">
+
+                        ${
+                            santri.jenisKelamin === "Putra"
+                            ? "👨"
+                            : "👩"
+                        }
+
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            ${escapeHtml(santri.nama)}
+                        </h3>
+
+                        <span class="badge ${
+                            santri.jenisKelamin === "Putra"
+                            ? "badge-putra"
+                            : "badge-putri"
+                        }">
+
+                            ${santri.jenisKelamin}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="detail-stats">
+
+                    <div class="detail-stat">
+
+                        <strong
+                            style="color:#15803d;"
+                        >
+                            ${stats.berjamaah}
+                        </strong>
+
+                        <small>
+                            🕌 Berjamaah
+                        </small>
+
+                    </div>
+
+
+                    <div class="detail-stat">
+
+                        <strong
+                            style="color:#ca8a04;"
+                        >
+                            ${stats.masbuk}
+                        </strong>
+
+                        <small>
+                            🟡 Masbuk
+                        </small>
+
+                    </div>
+
+
+                    <div class="detail-stat">
+
+                        <strong
+                            style="color:#ea580c;"
+                        >
+                            ${stats.terlambat}
+                        </strong>
+
+                        <small>
+                            🟠 Terlambat
+                        </small>
+
+                    </div>
+
+
+                    <div class="detail-stat">
+
+                        <strong
+                            style="color:#2563eb;"
+                        >
+                            ${stats.izin}
+                        </strong>
+
+                        <small>
+                            🔵 Izin
+                        </small>
+
+                    </div>
+
+
+                    <div class="detail-stat">
+
+                        <strong
+                            style="color:#dc2626;"
+                        >
+                            ${stats.alpa}
+                        </strong>
+
+                        <small>
+                            🔴 Alpa
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div style="margin-top:20px;">
+
+                    <div style="display:flex;justify-content:space-between;font-size:13px;">
+
+                        <strong>
+                            Persentase Berjamaah
+                        </strong>
+
+                        <strong>
+                            ${percentage}%
+                        </strong>
+
+                    </div>
+
+                    <div class="progress">
+
+                        <div
+                            class="progress-bar"
+                            style="width:${percentage}%"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+};
+
+
+function calculateSantriStats(id) {
+
+    const stats = {
+
+        berjamaah: 0,
+
+        masbuk: 0,
+
+        terlambat: 0,
+
+        izin: 0,
+
+        alpa: 0
+
+    };
+
+
+    Object.values(absensiData)
+    .forEach(tanggal => {
+
+        Object.values(tanggal || {})
+        .forEach(sholat => {
+
+            const status =
+                sholat?.[id];
+
+
+            if(status && stats[status] !== undefined) {
+
+                stats[status]++;
+
+            }
+
+        });
+
+    });
+
+
+    return stats;
+
+}
+
+
+/* ============================================================
+   ESCAPE HTML
+============================================================ */
+
+function escapeHtml(text) {
+
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* ============================================================
+   INITIAL
+============================================================ */
+
+document.getElementById("tanggalAbsensi")
+.value = today();
+
+document.getElementById("dashboardDate")
+.value = today();
+
+
+document
+    .getElementById("tanggalAbsensi")
+    .addEventListener(
+        "change",
+        renderAbsensi
+    );
+
+
+document
+    .getElementById("sholatAbsensi")
+    .addEventListener(
+        "change",
+        renderAbsensi
+    );
+
+
+loadAllData();
+
+</script>
+
+</body>
+</html>
+```
