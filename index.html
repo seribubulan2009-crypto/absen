@@ -956,6 +956,126 @@ th{
 
 }
 
+
+/* =========================================================
+   REKAP 5 WAKTU - ACCORDION
+========================================================= */
+.prayer-rekap-card{
+    border:1px solid #e5e7eb!important;
+    border-radius:14px!important;
+    background:#fff;
+    box-shadow:0 2px 8px rgba(0,0,0,.04);
+}
+.prayer-status-select{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+.prayer-status-item{
+    width:100%;
+}
+.prayer-status-btn{
+    width:100%;
+    min-height:52px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:10px 13px;
+    border:1px solid #e5e7eb;
+    border-radius:11px;
+    background:#fafafa;
+    color:#17201a;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:700;
+    text-align:left;
+    transition:all .18s ease;
+}
+.prayer-status-btn:hover{
+    background:#f0fdf4;
+    border-color:#86efac;
+    transform:translateY(-1px);
+}
+.prayer-status-btn.open{
+    background:#f0fdf4;
+    border-color:#22c55e;
+    border-bottom-left-radius:6px;
+    border-bottom-right-radius:6px;
+}
+.prayer-status-btn > span:first-child{
+    flex:1;
+}
+.prayer-status-btn strong{
+    min-width:30px;
+    height:30px;
+    padding:0 8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:20px;
+    background:#166534;
+    color:#fff;
+    font-size:11px;
+}
+.prayer-status-btn .chev{
+    width:24px;
+    height:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:#e5e7eb;
+    color:#4b5563;
+    font-size:14px;
+    transition:transform .2s ease,background .2s ease;
+}
+.prayer-status-btn.open .chev{
+    transform:rotate(180deg);
+    background:#bbf7d0;
+    color:#166534;
+}
+.prayer-name-list{
+    display:none;
+    padding:5px 8px 8px;
+    border:1px solid #86efac;
+    border-top:0;
+    border-radius:0 0 11px 11px;
+    background:#f0fdf4;
+}
+.prayer-name-list.open{
+    display:block;
+}
+.prayer-name-row{
+    display:block;
+    width:100%;
+    padding:9px 10px;
+    margin-top:4px;
+    border-radius:7px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    font-size:11px;
+    color:#374151;
+}
+.prayer-name-row:first-child{margin-top:0}
+.prayer-name-row::before{
+    content:'•';
+    color:#15803d;
+    font-weight:bold;
+    margin-right:7px;
+}
+.prayer-empty{
+    padding:10px;
+    color:#9ca3af;
+    text-align:center;
+    font-size:10px;
+}
+@media(max-width:600px){
+    .prayer-status-btn{min-height:50px;padding:9px 11px;font-size:11px}
+    .prayer-status-btn strong{min-width:28px;height:28px}
+    .prayer-name-row{font-size:11px;padding:8px 9px}
+}
+
 </style>
 </head>
 
@@ -3528,38 +3648,46 @@ function(){
         Object.entries(data).forEach(([id,status])=>{ if(counts[status]!==undefined) counts[status]++; });
 
         const statusBlocks=[
-            ["berjamaah","🕌","Jamaah"],
+            ["berjamaah","🕌","Berjamaah"],
             ["masbuk","🟡","Masbuk"],
             ["terlambat","🟠","Telat"],
             ["izin","🔵","Izin"],
             ["alpa","🔴","Alpa"],
-            ["mens","🟣","Mens"]
+            ["mens","🟣","Mens/Udzur"]
         ];
 
-        let html=`<div class="card" style="margin-bottom:10px;padding:12px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
+        let html=`<div class="card prayer-rekap-card" style="margin-bottom:10px;padding:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;gap:8px">
                 <strong style="font-size:13px">🕌 ${label}</strong>
                 <span style="font-size:9px;color:#6b7280">${Object.keys(data).length} tercatat</span>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px">`;
+            <div class="prayer-status-select">`;
 
         statusBlocks.forEach(([st,icon,text])=>{
             const visible=st!=="mens" || Object.entries(data).some(([id])=>santriData[id]?.jenisKelamin==="Putri");
             if(!visible) return;
-            html+=`<div style="background:#f8faf9;border-radius:7px;padding:7px 3px;text-align:center"><strong style="display:block;font-size:16px">${counts[st]}</strong><small style="font-size:8px">${icon} ${text}</small></div>`;
+            const arr=Object.entries(data).filter(([id,status])=>status===st && santriData[id] && (st!=="mens" || santriData[id]?.jenisKelamin==="Putri"));
+            const listId=`${key}-${st}-list`;
+            html+=`<div class="prayer-status-item">
+                <button type="button" class="prayer-status-btn" onclick="togglePrayerNames('${listId}',this)">
+                    <span>${icon} ${text}</span><strong>${counts[st]}</strong><span class="chev">▾</span>
+                </button>
+                <div id="${listId}" class="prayer-name-list">
+                    ${arr.length ? arr.map(([id])=>`<div class="prayer-name-row">${escapeHtml(santriData[id].nama)}</div>`).join("") : `<div class="prayer-empty">Belum ada</div>`}
+                </div>
+            </div>`;
         });
-        html+=`</div><div style="margin-top:9px;font-size:9px;color:#4b5563"><strong>Nama per status:</strong></div>`;
-
-        statusBlocks.forEach(([st,icon,text])=>{
-            const arr=Object.entries(data).filter(([id,status])=>status===st && santriData[id] && (st!=="mens" || santriData[id].jenisKelamin==="Putri"));
-            if(!arr.length) return;
-            html+=`<div style="margin-top:5px"><strong style="font-size:9px">${icon} ${text}:</strong> <span style="font-size:9px">${arr.map(([id])=>escapeHtml(santriData[id].nama)).join(", ")}</span></div>`;
-        });
-        if(!Object.keys(data).length) html+=`<div style="margin-top:6px;color:#9ca3af;font-size:9px">Belum ada input absensi.</div>`;
-        html+=`</div>`;
+        html+=`</div></div>`;
         container.innerHTML+=html;
     });
 
+};
+
+window.togglePrayerNames=function(id,btn){
+    const el=document.getElementById(id);
+    if(!el)return;
+    const open=el.classList.toggle("open");
+    btn.classList.toggle("open",open);
 };
 
 function setPct(
