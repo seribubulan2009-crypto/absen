@@ -1266,6 +1266,12 @@ th{
                             <td id="dashAlpaPct">0%</td>
                         </tr>
 
+                        <tr>
+                            <td>🟣 Mens/Udzur</td>
+                            <td id="dashMens">0</td>
+                            <td id="dashMensPct">0%</td>
+                        </tr>
+
                     </tbody>
 
                 </table>
@@ -1841,6 +1847,29 @@ th{
 
     </div>
 
+
+    <div class="card">
+
+        <div class="card-header">
+            <h3>🟣 Mens/Udzur Terbanyak (Putri)</h3>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ranking</th>
+                        <th>Nama</th>
+                        <th>Jenis</th>
+                        <th>Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody id="rankingMens"></tbody>
+            </table>
+        </div>
+
+    </div>
+
 </section>
 
 
@@ -1992,6 +2021,10 @@ th{
 
                     <option value="alpa">
                         Alpa
+                    </option>
+
+                    <option value="mens">
+                        Mens / Udzur
                     </option>
 
                 </select>
@@ -3315,6 +3348,14 @@ function(){
                                 current
                             )}
 
+                            ${s.jenisKelamin === "Putri" ? statusButton(
+                                id,
+                                "mens",
+                                "🟣",
+                                "Mens",
+                                current
+                            ) : ""}
+
                         </div>
 
                     </td>
@@ -3439,295 +3480,87 @@ window.loadDashboard =
 function(){
 
     const tanggal =
-        document
-        .getElementById(
-            "dashboardDate"
-        )
-        .value;
+        document.getElementById("dashboardDate").value;
 
+    const total = Object.keys(santriData).length;
 
-    const total =
-        Object.keys(
-            santriData
-        ).length;
+    let putra=0, putri=0;
+    Object.values(santriData).forEach(s=>{
+        if(s.jenisKelamin==="Putra") putra++;
+        if(s.jenisKelamin==="Putri") putri++;
+    });
 
+    document.getElementById("totalSantri").textContent=total;
+    document.getElementById("totalPutra").textContent=putra;
+    document.getElementById("totalPutri").textContent=putri;
 
-    let putra=0;
-    let putri=0;
+    const stats={berjamaah:0,masbuk:0,terlambat:0,izin:0,alpa:0,mens:0};
+    const names={subuh:"Subuh",dzuhur:"Dzuhur",ashar:"Ashar",maghrib:"Maghrib",isya:"Isya"};
 
+    Object.entries(absensiData?.[tanggal]||{}).forEach(([sholat,data])=>{
+        Object.values(data||{}).forEach(status=>{
+            if(stats[status]!==undefined) stats[status]++;
+        });
+    });
 
-    Object.values(
-        santriData
-    )
-    .forEach(
-        s=>{
+    document.getElementById("totalJamaah").textContent=stats.berjamaah;
+    document.getElementById("dashJamaah").textContent=stats.berjamaah;
+    document.getElementById("dashMasbuk").textContent=stats.masbuk;
+    document.getElementById("dashTerlambat").textContent=stats.terlambat;
+    document.getElementById("dashIzin").textContent=stats.izin;
+    document.getElementById("dashAlpa").textContent=stats.alpa;
+    document.getElementById("dashMens").textContent=stats.mens;
 
-            if(
-                s.jenisKelamin
-                ==="Putra"
-            )
-                putra++;
+    const totalStatus=Object.values(stats).reduce((a,b)=>a+b,0);
+    setPct("dashJamaahPct",stats.berjamaah,totalStatus);
+    setPct("dashMasbukPct",stats.masbuk,totalStatus);
+    setPct("dashTerlambatPct",stats.terlambat,totalStatus);
+    setPct("dashIzinPct",stats.izin,totalStatus);
+    setPct("dashAlpaPct",stats.alpa,totalStatus);
+    setPct("dashMensPct",stats.mens,totalStatus);
 
-
-            if(
-                s.jenisKelamin
-                ==="Putri"
-            )
-                putri++;
-
-        }
-    );
-
-
-    document
-        .getElementById(
-            "totalSantri"
-        )
-        .textContent =
-        total;
-
-
-    document
-        .getElementById(
-            "totalPutra"
-        )
-        .textContent =
-        putra;
-
-
-    document
-        .getElementById(
-            "totalPutri"
-        )
-        .textContent =
-        putri;
-
-
-    const stats={
-
-        berjamaah:0,
-        masbuk:0,
-        terlambat:0,
-        izin:0,
-        alpa:0
-
-    };
-
-
-    const prayers={
-
-        subuh:0,
-        dzuhur:0,
-        ashar:0,
-        maghrib:0,
-        isya:0
-
-    };
-
-
-    Object.entries(
-        absensiData
-        ?.[tanggal]
-        ||
-        {}
-    )
-    .forEach(
-        ([sholat,data])=>{
-
-
-            Object.values(
-                data||{}
-            )
-            .forEach(
-                status=>{
-
-                    if(
-                        stats[status]
-                        !==undefined
-                    )
-                        stats[status]++;
-
-                }
-            );
-
-
-            prayers[sholat]=
-                Object.keys(
-                    data||{}
-                ).length;
-
-        }
-    );
-
-
-    document
-        .getElementById(
-            "totalJamaah"
-        )
-        .textContent =
-        stats.berjamaah;
-
-
-    document
-        .getElementById(
-            "dashJamaah"
-        )
-        .textContent =
-        stats.berjamaah;
-
-
-    document
-        .getElementById(
-            "dashMasbuk"
-        )
-        .textContent =
-        stats.masbuk;
-
-
-    document
-        .getElementById(
-            "dashTerlambat"
-        )
-        .textContent =
-        stats.terlambat;
-
-
-    document
-        .getElementById(
-            "dashIzin"
-        )
-        .textContent =
-        stats.izin;
-
-
-    document
-        .getElementById(
-            "dashAlpa"
-        )
-        .textContent =
-        stats.alpa;
-
-
-    const totalStatus =
-        Object.values(stats)
-        .reduce(
-            (a,b)=>a+b,
-            0
-        );
-
-
-    setPct(
-        "dashJamaahPct",
-        stats.berjamaah,
-        totalStatus
-    );
-
-    setPct(
-        "dashMasbukPct",
-        stats.masbuk,
-        totalStatus
-    );
-
-    setPct(
-        "dashTerlambatPct",
-        stats.terlambat,
-        totalStatus
-    );
-
-    setPct(
-        "dashIzinPct",
-        stats.izin,
-        totalStatus
-    );
-
-    setPct(
-        "dashAlpaPct",
-        stats.alpa,
-        totalStatus
-    );
-
-
-    const names={
-
-        subuh:"Subuh",
-        dzuhur:"Dzuhur",
-        ashar:"Ashar",
-        maghrib:"Maghrib",
-        isya:"Isya"
-
-    };
-
-
-    const container =
-        document
-        .getElementById(
-            "dashboardPrayerStats"
-        );
-
-
+    const container=document.getElementById("dashboardPrayerStats");
     container.innerHTML="";
 
+    Object.entries(names).forEach(([key,label])=>{
+        const data=absensiData?.[tanggal]?.[key]||{};
+        const counts={berjamaah:0,masbuk:0,terlambat:0,izin:0,alpa:0,mens:0};
+        Object.entries(data).forEach(([id,status])=>{ if(counts[status]!==undefined) counts[status]++; });
 
-    Object.entries(
-        prayers
-    )
-    .forEach(
-        ([key,value])=>{
+        const statusBlocks=[
+            ["berjamaah","🕌","Jamaah"],
+            ["masbuk","🟡","Masbuk"],
+            ["terlambat","🟠","Telat"],
+            ["izin","🔵","Izin"],
+            ["alpa","🔴","Alpa"],
+            ["mens","🟣","Mens"]
+        ];
 
-            const percent =
-                total>0
-                ?
-                Math.min(
-                    100,
-                    value/total*100
-                )
-                :
-                0;
+        let html=`<div class="card" style="margin-bottom:10px;padding:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
+                <strong style="font-size:13px">🕌 ${label}</strong>
+                <span style="font-size:9px;color:#6b7280">${Object.keys(data).length} tercatat</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px">`;
 
+        statusBlocks.forEach(([st,icon,text])=>{
+            const visible=st!=="mens" || Object.entries(data).some(([id])=>santriData[id]?.jenisKelamin==="Putri");
+            if(!visible) return;
+            html+=`<div style="background:#f8faf9;border-radius:7px;padding:7px 3px;text-align:center"><strong style="display:block;font-size:16px">${counts[st]}</strong><small style="font-size:8px">${icon} ${text}</small></div>`;
+        });
+        html+=`</div><div style="margin-top:9px;font-size:9px;color:#4b5563"><strong>Nama per status:</strong></div>`;
 
-            container.innerHTML+=`
-
-                <div style="margin-bottom:14px">
-
-                    <div
-                        style="
-                        display:flex;
-                        justify-content:space-between;
-                        font-size:11px
-                        "
-                    >
-
-                        <strong>
-                            ${names[key]}
-                        </strong>
-
-                        <span>
-                            ${value} tercatat
-                        </span>
-
-                    </div>
-
-
-                    <div class="progress">
-
-                        <div
-                            class="progress-bar"
-                            style="
-                            width:${percent}%
-                            "
-                        ></div>
-
-                    </div>
-
-                </div>
-
-            `;
-
-        }
-    );
+        statusBlocks.forEach(([st,icon,text])=>{
+            const arr=Object.entries(data).filter(([id,status])=>status===st && santriData[id] && (st!=="mens" || santriData[id].jenisKelamin==="Putri"));
+            if(!arr.length) return;
+            html+=`<div style="margin-top:5px"><strong style="font-size:9px">${icon} ${text}:</strong> <span style="font-size:9px">${arr.map(([id])=>escapeHtml(santriData[id].nama)).join(", ")}</span></div>`;
+        });
+        if(!Object.keys(data).length) html+=`<div style="margin-top:6px;color:#9ca3af;font-size:9px">Belum ada input absensi.</div>`;
+        html+=`</div>`;
+        container.innerHTML+=html;
+    });
 
 };
-
 
 function setPct(
     id,
@@ -3987,6 +3820,12 @@ function(){
 
                         </div>
 
+                        ${s.jenisKelamin === "Putri" ? `
+                        <div class="detail-stat">
+                            <strong style="color:#9333a3">${stats.mens}</strong>
+                            <small>🟣 Mens/Udzur</small>
+                        </div>` : ""}
+
                     </div>
 
 
@@ -4042,7 +3881,8 @@ function calculateSantriStats(id){
         masbuk:0,
         terlambat:0,
         izin:0,
-        alpa:0
+        alpa:0,
+        mens:0
 
     };
 
@@ -4127,7 +3967,8 @@ function(){
                 masbuk:0,
                 terlambat:0,
                 izin:0,
-                alpa:0
+                alpa:0,
+                mens:0
 
             };
 
@@ -4211,6 +4052,12 @@ function(){
         statistik,
         "alpa",
         "rankingAlpa"
+    );
+
+    tampilkanRanking(
+        statistik,
+        "mens",
+        "rankingMens"
     );
 
 };
@@ -4938,7 +4785,10 @@ function statusLabel(
         "🔵 Izin",
 
         alpa:
-        "🔴 Alpa"
+        "🔴 Alpa",
+
+        mens:
+        "🟣 Mens/Udzur"
 
     };
 
