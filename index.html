@@ -1130,6 +1130,13 @@ th{
 
 
         <button
+            onclick="showPage('rekap5',this)"
+        >
+            <span>📋</span>
+            Rekap 5 Waktu
+        </button>
+
+        <button
             onclick="showPage('santri',this)"
         >
             <span>👥</span>
@@ -1400,27 +1407,28 @@ th{
 
         </div>
 
-
-
-        <div class="card">
-
-            <div class="card-header">
-
-                <h3>
-                    🕌 Rekap 5 Waktu
-                </h3>
-
-            </div>
-
-            <div id="dashboardPrayerStats"></div>
-
-        </div>
-
     </div>
 
 </section>
 
 
+
+<!-- =========================================================
+     REKAP 5 WAKTU
+========================================================= -->
+<section class="page" id="rekap5">
+    <div class="page-title">
+        <h2>Rekap 5 Waktu</h2>
+        <p>Pilih tanggal, lalu buka Subuh, Dzuhur, Ashar, Maghrib, atau Isya untuk melihat nama santri berdasarkan status.</p>
+    </div>
+    <div class="card">
+        <div class="form-group" style="max-width:260px">
+            <label>Tanggal Rekap</label>
+            <input type="date" id="rekap5Date">
+        </div>
+    </div>
+    <div id="rekap5Stats"></div>
+</section>
 
 <!-- =========================================================
      ABSENSI
@@ -2711,17 +2719,11 @@ async function loadAllData(){
             "🟢 Terhubung";
 
 
+        // Optimasi awal: muat hanya halaman yang sedang dibuka.
         renderSantri();
-
         renderAbsensi();
-
         loadDashboard();
-
-        renderStatistik();
-
-        renderStatistikBulanan();
-
-        jalankanRiset();
+        // Statistik, bulanan, dan riset dihitung saat menunya dibuka.
 
 
     }catch(error){
@@ -2779,6 +2781,9 @@ function(page,button){
         dashboard:
         "Dashboard",
 
+        rekap5:
+        "Rekap 5 Waktu",
+
         absensi:
         "Absensi Sholat",
 
@@ -2807,6 +2812,9 @@ function(page,button){
         .textContent =
         titles[page];
 
+
+    if(page==="dashboard") loadDashboard();
+    if(page==="rekap5") renderRekap5();
 
     document
         .getElementById(
@@ -3562,16 +3570,11 @@ async function(
             status;
 
 
+        // Optimasi: jangan render semua halaman setiap satu absensi disimpan.
         renderAbsensi();
-
-        loadDashboard();
-
-        renderStatistik();
-
-        renderStatistikBulanan();
-
-        jalankanRiset();
-
+        const activePage = document.querySelector(".page.active")?.id;
+        if(activePage === "dashboard") loadDashboard();
+        if(activePage === "rekap5") renderRekap5();
 
         showToast(
             "Absensi tersimpan"
@@ -3598,89 +3601,67 @@ async function(
 
 window.loadDashboard =
 function(){
-
-    const tanggal =
-        document.getElementById("dashboardDate").value;
-
-    const total = Object.keys(santriData).length;
-
-    let putra=0, putri=0;
-    Object.values(santriData).forEach(s=>{
+    const dateEl=document.getElementById("dashboardDate");
+    const tanggal=(dateEl && dateEl.value) || today();
+    const total=Object.keys(santriData||{}).length;
+    let putra=0,putri=0;
+    Object.values(santriData||{}).forEach(s=>{
         if(s.jenisKelamin==="Putra") putra++;
         if(s.jenisKelamin==="Putri") putri++;
     });
-
-    document.getElementById("totalSantri").textContent=total;
-    document.getElementById("totalPutra").textContent=putra;
-    document.getElementById("totalPutri").textContent=putri;
-
     const stats={berjamaah:0,masbuk:0,terlambat:0,izin:0,alpa:0,mens:0};
-    const names={subuh:"Subuh",dzuhur:"Dzuhur",ashar:"Ashar",maghrib:"Maghrib",isya:"Isya"};
-
-    Object.entries(absensiData?.[tanggal]||{}).forEach(([sholat,data])=>{
-        Object.values(data||{}).forEach(status=>{
+    Object.values(absensiData?.[tanggal]||{}).forEach(sholatData=>{
+        Object.values(sholatData||{}).forEach(status=>{
             if(stats[status]!==undefined) stats[status]++;
         });
     });
-
-    document.getElementById("totalJamaah").textContent=stats.berjamaah;
-    document.getElementById("dashJamaah").textContent=stats.berjamaah;
-    document.getElementById("dashMasbuk").textContent=stats.masbuk;
-    document.getElementById("dashTerlambat").textContent=stats.terlambat;
-    document.getElementById("dashIzin").textContent=stats.izin;
-    document.getElementById("dashAlpa").textContent=stats.alpa;
-    document.getElementById("dashMens").textContent=stats.mens;
-
+    const safeSet=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
+    safeSet("totalSantri",total); safeSet("totalPutra",putra); safeSet("totalPutri",putri);
+    safeSet("totalJamaah",stats.berjamaah);
     const totalStatus=Object.values(stats).reduce((a,b)=>a+b,0);
-    setPct("dashJamaahPct",stats.berjamaah,totalStatus);
-    setPct("dashMasbukPct",stats.masbuk,totalStatus);
-    setPct("dashTerlambatPct",stats.terlambat,totalStatus);
-    setPct("dashIzinPct",stats.izin,totalStatus);
-    setPct("dashAlpaPct",stats.alpa,totalStatus);
-    setPct("dashMensPct",stats.mens,totalStatus);
+    safeSet("dashJamaah",stats.berjamaah); safeSet("dashMasbuk",stats.masbuk);
+    safeSet("dashTerlambat",stats.terlambat); safeSet("dashIzin",stats.izin);
+    safeSet("dashAlpa",stats.alpa); safeSet("dashMens",stats.mens);
+    if(typeof setPct==="function"){
+      setPct("dashJamaahPct",stats.berjamaah,totalStatus); setPct("dashMasbukPct",stats.masbuk,totalStatus);
+      setPct("dashTerlambatPct",stats.terlambat,totalStatus); setPct("dashIzinPct",stats.izin,totalStatus);
+      setPct("dashAlpaPct",stats.alpa,totalStatus); setPct("dashMensPct",stats.mens,totalStatus);
+    }
+};
 
-    const container=document.getElementById("dashboardPrayerStats");
-    container.innerHTML="";
-
+window.renderRekap5 = function(){
+    const tanggal = document.getElementById("rekap5Date").value || today();
+    const container = document.getElementById("rekap5Stats");
+    if(!container) return;
+    const names={subuh:"Subuh",dzuhur:"Dzuhur",ashar:"Ashar",maghrib:"Maghrib",isya:"Isya"};
+    const statusBlocks=[
+        ["berjamaah","🕌","Berjamaah"],
+        ["masbuk","🟡","Masbuk"],
+        ["terlambat","🟠","Telat"],
+        ["izin","🔵","Izin"],
+        ["alpa","🔴","Alpa"],
+        ["mens","🟣","Mens/Udzur"]
+    ];
+    let html='';
     Object.entries(names).forEach(([key,label])=>{
         const data=absensiData?.[tanggal]?.[key]||{};
         const counts={berjamaah:0,masbuk:0,terlambat:0,izin:0,alpa:0,mens:0};
         Object.entries(data).forEach(([id,status])=>{ if(counts[status]!==undefined) counts[status]++; });
-
-        const statusBlocks=[
-            ["berjamaah","🕌","Berjamaah"],
-            ["masbuk","🟡","Masbuk"],
-            ["terlambat","🟠","Telat"],
-            ["izin","🔵","Izin"],
-            ["alpa","🔴","Alpa"],
-            ["mens","🟣","Mens/Udzur"]
-        ];
-
-        let html=`<div class="card prayer-rekap-card" style="margin-bottom:10px;padding:12px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;gap:8px">
-                <strong style="font-size:13px">🕌 ${label}</strong>
-                <span style="font-size:9px;color:#6b7280">${Object.keys(data).length} tercatat</span>
-            </div>
-            <div class="prayer-status-select">`;
-
+        html+=`<div class="card prayer-rekap-card" style="margin-bottom:12px;padding:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px">
+                <strong style="font-size:15px">🕌 ${label}</strong>
+                <span style="font-size:10px;color:#6b7280">${Object.keys(data).length} tercatat</span>
+            </div><div class="prayer-status-select">`;
         statusBlocks.forEach(([st,icon,text])=>{
             const visible=st!=="mens" || Object.entries(data).some(([id])=>santriData[id]?.jenisKelamin==="Putri");
             if(!visible) return;
             const arr=Object.entries(data).filter(([id,status])=>status===st && santriData[id] && (st!=="mens" || santriData[id]?.jenisKelamin==="Putri"));
-            const listId=`${key}-${st}-list`;
-            html+=`<div class="prayer-status-item">
-                <button type="button" class="prayer-status-btn" onclick="togglePrayerNames('${listId}',this)">
-                    <span>${icon} ${text}</span><strong>${counts[st]}</strong><span class="chev">▾</span>
-                </button>
-                <div id="${listId}" class="prayer-name-list">
-                    ${arr.length ? arr.map(([id])=>`<div class="prayer-name-row">${escapeHtml(santriData[id].nama)}</div>`).join("") : `<div class="prayer-empty">Belum ada</div>`}
-                </div>
-            </div>`;
+            const listId=`rekap5-${key}-${st}-list`;
+            html+=`<div class="prayer-status-item"><button type="button" class="prayer-status-btn" onclick="togglePrayerNames('${listId}',this)"><span>${icon} ${text}</span><strong>${counts[st]}</strong><span class="chev">▾</span></button><div id="${listId}" class="prayer-name-list">${arr.length?arr.map(([id])=>`<div class="prayer-name-row">${escapeHtml(santriData[id].nama)}</div>`).join(""):`<div class="prayer-empty">Belum ada</div>`}</div></div>`;
         });
-        html+=`</div></div>`;
-        container.innerHTML+=html;
+        html+='</div></div>';
     });
-
+    container.innerHTML=html;
 };
 
 window.togglePrayerNames=function(id,btn){
@@ -5199,14 +5180,11 @@ document
     );
 
 
-document
-    .getElementById(
-        "searchStatistik"
-    )
-    .addEventListener(
-        "input",
-        renderStatistik
-    );
+let statistikTimer;
+document.getElementById("searchStatistik").addEventListener("input",()=>{
+    clearTimeout(statistikTimer);
+    statistikTimer=setTimeout(renderStatistik,180);
+});
 
 
 document
@@ -5217,6 +5195,9 @@ document
         "change",
         loadDashboard
     );
+
+
+document.getElementById("rekap5Date").addEventListener("change", renderRekap5);
 
 
 document
@@ -5239,14 +5220,11 @@ document
     );
 
 
-document
-    .getElementById(
-        "risetNama"
-    )
-    .addEventListener(
-        "input",
-        jalankanRiset
-    );
+let risetTimer;
+document.getElementById("risetNama").addEventListener("input",()=>{
+    clearTimeout(risetTimer);
+    risetTimer=setTimeout(jalankanRiset,220);
+});
 
 
 document
