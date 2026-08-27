@@ -1076,11 +1076,20 @@ th{
     .prayer-name-row{font-size:11px;padding:8px 9px}
 }
 
+
+/* MULTI ACTIVITY SELECTOR */
+#activityChooser{position:fixed;inset:0;background:#f5f7f6;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
+.chooser-box{width:min(980px,100%);text-align:center}
+.chooser-logo-wrap{width:min(560px,88vw);margin:0 auto 14px;background:transparent;position:relative}
+.chooser-logo{width:100%;height:auto;max-height:230px;object-fit:contain;display:block;margin:0 auto}
+.chooser-title{font-size:30px;margin:0 0 8px;color:#17201a}.chooser-sub{color:#64748b;margin-bottom:25px}.chooser-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.chooser-card{background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:22px 16px;cursor:pointer;box-shadow:0 8px 25px rgba(0,0,0,.06);transition:.18s}.chooser-card:hover{transform:translateY(-3px);border-color:#22c55e}.chooser-icon{font-size:42px}.chooser-card h3{margin:10px 0 7px}.chooser-card p{font-size:12px;color:#64748b;line-height:1.5}@media(max-width:760px){.chooser-grid{grid-template-columns:1fr 1fr}.chooser-title{font-size:24px}.chooser-logo-wrap{width:min(500px,90vw)}}@media(max-width:430px){.chooser-grid{grid-template-columns:1fr}.chooser-card{padding:18px}.chooser-logo-wrap{width:min(380px,92vw);margin-bottom:12px}.chooser-logo{max-height:170px}}
 </style>
 </head>
 
 
 <body>
+<div id="activityChooser"><div class="chooser-box"><div class="chooser-logo-wrap"><img src="Pondok Pesantren_20251006_171105_0000.png" alt="Logo Pondok Pesantren Seribu Bulan" class="chooser-logo"></div><h1 class="chooser-title">Sistem Absensi</h1><div class="chooser-sub">Pondok Pesantren Seribu Bulan<br>Pilih kegiatan yang ingin dibuka</div><div class="chooser-grid"><div class="chooser-card" onclick="chooseActivity('sholat')"><div class="chooser-icon">🕌</div><h3>Absensi Sholat</h3><p>Dashboard, Absensi, Rekap 5 Waktu, Statistik dan Riset</p></div><div class="chooser-card" onclick="chooseActivity('mufrodat')"><div class="chooser-icon">📖</div><h3>Absensi Mufrodat</h3><p>Hadir, Izin, Alpa + Dashboard dan Statistik</p></div><div class="chooser-card" onclick="chooseActivity('muhadoroh')"><div class="chooser-icon">🎤</div><h3>Absensi Muhadoroh</h3><p>Hadir, Telat, Tidak Hafal, Izin, Alpa</p></div><div class="chooser-card" onclick="chooseActivity('muhadasah')"><div class="chooser-icon">💬</div><h3>Absensi Muhadasah</h3><p>Hadir, Telat, Tidak Hafal, Izin, Alpa</p></div></div></div></div>
+
 
 
 <!-- =========================================================
@@ -1175,6 +1184,7 @@ th{
             Pengaturan
         </button>
 
+        <button onclick="backToActivities()"><span>🏠</span> Pilih Absensi</button>
     </div>
 
 </aside>
@@ -1352,10 +1362,6 @@ th{
                                 Jumlah
                             </th>
 
-                            <th>
-                                Persentase
-                            </th>
-
                         </tr>
 
                     </thead>
@@ -1366,37 +1372,31 @@ th{
                         <tr>
                             <td>🕌 Berjamaah</td>
                             <td id="dashJamaah">0</td>
-                            <td id="dashJamaahPct">0%</td>
                         </tr>
 
                         <tr>
                             <td>🟡 Masbuk</td>
                             <td id="dashMasbuk">0</td>
-                            <td id="dashMasbukPct">0%</td>
                         </tr>
 
                         <tr>
                             <td>🟠 Terlambat</td>
                             <td id="dashTerlambat">0</td>
-                            <td id="dashTerlambatPct">0%</td>
                         </tr>
 
                         <tr>
                             <td>🔵 Izin</td>
                             <td id="dashIzin">0</td>
-                            <td id="dashIzinPct">0%</td>
                         </tr>
 
                         <tr>
                             <td>🔴 Alpa</td>
                             <td id="dashAlpa">0</td>
-                            <td id="dashAlpaPct">0%</td>
                         </tr>
 
                         <tr>
                             <td>🟣 Mens/Udzur</td>
                             <td id="dashMens">0</td>
-                            <td id="dashMensPct">0%</td>
                         </tr>
 
                     </tbody>
@@ -2610,6 +2610,21 @@ let absensiData = {};
 
 let genderFilter = "semua";
 
+let currentActivity = localStorage.getItem("currentActivity") || "sholat";
+const activityConfig = {
+  sholat:{title:"Absensi Sholat",icon:"🕌",path:"absensi",statuses:[["berjamaah","🕌","Jamaah"],["masbuk","🟡","Masbuk"],["terlambat","🟠","Telat"],["izin","🔵","Izin"],["alpa","🔴","Alpa"]]},
+  mufrodat:{title:"Absensi Mufrodat",icon:"📖",path:"absensiMufrodat",statuses:[["hadir","✅","Hadir"],["izin","🔵","Izin"],["alpa","🔴","Alpa"]]},
+  muhadoroh:{title:"Absensi Muhadoroh",icon:"🎤",path:"absensiMuhadoroh",statuses:[["hadir","✅","Hadir"],["terlambat","🟠","Telat"],["tidakHafal","📕","Tidak Hafal"],["izin","🔵","Izin"],["alpa","🔴","Alpa"]]},
+  muhadasah:{title:"Absensi Muhadasah",icon:"💬",path:"absensiMuhadasah",statuses:[["hadir","✅","Hadir"],["terlambat","🟠","Telat"],["tidakHafal","📕","Tidak Hafal"],["izin","🔵","Izin"],["alpa","🔴","Alpa"]]}
+};
+function activityPath(){ return activityConfig[currentActivity].path; }
+function getActivityStatusButtons(id,current,santri){
+  let list=activityConfig[currentActivity].statuses.slice();
+  if(currentActivity==="sholat" && santri.jenisKelamin==="Putri") list.push(["mens","🟣","Mens"]);
+  return list.map(x=>statusButton(id,x[0],x[1],x[2],current)).join("");
+}
+
+
 
 
 /* =========================================================
@@ -2691,7 +2706,7 @@ async function loadAllData(){
 
         const absensiSnapshot =
             await get(
-                ref(db,"absensi")
+                ref(db,activityPath())
             );
 
 
@@ -2785,7 +2800,7 @@ function(page,button){
         "Rekap 5 Waktu",
 
         absensi:
-        "Absensi Sholat",
+        activityConfig[currentActivity].title,
 
         santri:
         "Data Santri",
@@ -2813,8 +2828,12 @@ function(page,button){
         titles[page];
 
 
+    // Render berat hanya saat halaman dibuka agar tetap ringan.
     if(page==="dashboard") loadDashboard();
-    if(page==="rekap5") renderRekap5();
+    if(page==="rekap5" && currentActivity==="sholat") renderRekap5();
+    if(page==="statistik") renderStatistik();
+    if(page==="bulanan") renderStatistikBulanan();
+    if(page==="riset") jalankanRiset();
 
     document
         .getElementById(
@@ -3294,12 +3313,9 @@ function(){
         .value;
 
 
-    const sholat =
-        document
-        .getElementById(
-            "sholatAbsensi"
-        )
-        .value;
+    const sholat = currentActivity === "sholat"
+        ? document.getElementById("sholatAbsensi").value
+        : "kegiatan";
 
 
     const search =
@@ -3436,53 +3452,7 @@ function(){
 
                         <div class="status-grid">
 
-                            ${statusButton(
-                                id,
-                                "berjamaah",
-                                "🕌",
-                                "Jamaah",
-                                current
-                            )}
-
-                            ${statusButton(
-                                id,
-                                "masbuk",
-                                "🟡",
-                                "Masbuk",
-                                current
-                            )}
-
-                            ${statusButton(
-                                id,
-                                "terlambat",
-                                "🟠",
-                                "Telat",
-                                current
-                            )}
-
-                            ${statusButton(
-                                id,
-                                "izin",
-                                "🔵",
-                                "Izin",
-                                current
-                            )}
-
-                            ${statusButton(
-                                id,
-                                "alpa",
-                                "🔴",
-                                "Alpa",
-                                current
-                            )}
-
-                            ${s.jenisKelamin === "Putri" ? statusButton(
-                                id,
-                                "mens",
-                                "🟣",
-                                "Mens",
-                                current
-                            ) : ""}
+${getActivityStatusButtons(id,current,s)}
 
                         </div>
 
@@ -3517,12 +3487,9 @@ async function(
         .value;
 
 
-    const sholat =
-        document
-        .getElementById(
-            "sholatAbsensi"
-        )
-        .value;
+    const sholat = currentActivity === "sholat"
+        ? document.getElementById("sholatAbsensi").value
+        : "kegiatan";
 
 
     if(!tanggal){
@@ -3542,7 +3509,7 @@ async function(
 
             ref(
                 db,
-                `absensi/${tanggal}/${sholat}/${id}`
+                `${activityPath()}/${tanggal}/${sholat}/${id}`
             ),
 
             status
@@ -3609,23 +3576,26 @@ function(){
         if(s.jenisKelamin==="Putra") putra++;
         if(s.jenisKelamin==="Putri") putri++;
     });
-    const stats={berjamaah:0,masbuk:0,terlambat:0,izin:0,alpa:0,mens:0};
-    Object.values(absensiData?.[tanggal]||{}).forEach(sholatData=>{
-        Object.values(sholatData||{}).forEach(status=>{
+    const stats={};
+    activityConfig[currentActivity].statuses.forEach(x=>stats[x[0]]=0);
+    if(currentActivity === "sholat") stats.mens=0;
+    Object.values(absensiData?.[tanggal]||{}).forEach(kegiatanData=>{
+        Object.values(kegiatanData||{}).forEach(status=>{
             if(stats[status]!==undefined) stats[status]++;
         });
     });
     const safeSet=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val;};
     safeSet("totalSantri",total); safeSet("totalPutra",putra); safeSet("totalPutri",putri);
-    safeSet("totalJamaah",stats.berjamaah);
+    const primary = currentActivity === "sholat" ? "berjamaah" : "hadir";
+    safeSet("totalJamaah",stats[primary]||0);
     const totalStatus=Object.values(stats).reduce((a,b)=>a+b,0);
-    safeSet("dashJamaah",stats.berjamaah); safeSet("dashMasbuk",stats.masbuk);
-    safeSet("dashTerlambat",stats.terlambat); safeSet("dashIzin",stats.izin);
-    safeSet("dashAlpa",stats.alpa); safeSet("dashMens",stats.mens);
+    safeSet("dashJamaah",stats[primary]||0); safeSet("dashMasbuk",stats.masbuk||0);
+    safeSet("dashTerlambat",stats.terlambat||0); safeSet("dashIzin",stats.izin||0);
+    safeSet("dashAlpa",stats.alpa||0); safeSet("dashMens",stats.mens||0);
     if(typeof setPct==="function"){
-      setPct("dashJamaahPct",stats.berjamaah,totalStatus); setPct("dashMasbukPct",stats.masbuk,totalStatus);
-      setPct("dashTerlambatPct",stats.terlambat,totalStatus); setPct("dashIzinPct",stats.izin,totalStatus);
-      setPct("dashAlpaPct",stats.alpa,totalStatus); setPct("dashMensPct",stats.mens,totalStatus);
+      setPct("dashJamaahPct",stats[primary]||0,totalStatus); setPct("dashMasbukPct",stats.masbuk||0,totalStatus);
+      setPct("dashTerlambatPct",stats.terlambat||0,totalStatus); setPct("dashIzinPct",stats.izin||0,totalStatus);
+      setPct("dashAlpaPct",stats.alpa||0,totalStatus); setPct("dashMensPct",stats.mens||0,totalStatus);
     }
 };
 
@@ -4039,138 +4009,51 @@ function calculateSantriStats(id){
 
 window.renderStatistikBulanan =
 function(){
-
-    const bulan =
-        document
-        .getElementById(
-            "bulanStatistik"
-        )
-        .value;
-
-
-    const tahun =
-        document
-        .getElementById(
-            "tahunStatistik"
-        )
-        .value;
-
-
+    const bulan = document.getElementById("bulanStatistik").value;
+    const tahun = document.getElementById("tahunStatistik").value;
     const statistik={};
+    const cfg=activityConfig[currentActivity];
 
+    Object.entries(santriData||{}).forEach(([id,s])=>{
+        statistik[id]={nama:s.nama,jenisKelamin:s.jenisKelamin};
+        cfg.statuses.forEach(([key])=>statistik[id][key]=0);
+        if(currentActivity==="sholat" && s.jenisKelamin==="Putri") statistik[id].mens=0;
+    });
 
-    Object.entries(
-        santriData
-    )
-    .forEach(
-        ([id,s])=>{
+    Object.entries(absensiData||{}).forEach(([tanggal,dataTanggal])=>{
+        if(!tanggal.startsWith(`${tahun}-${bulan}`)) return;
+        // Sholat memiliki 5 waktu, kegiatan lain satu kumpulan absensi per tanggal.
+        const groups=currentActivity==="sholat" ? Object.values(dataTanggal||{}) : [dataTanggal||{}];
+        groups.forEach(group=>{
+            Object.entries(group||{}).forEach(([id,status])=>{
+                if(statistik[id] && Object.prototype.hasOwnProperty.call(statistik[id],status)) statistik[id][status]++;
+            });
+        });
+    });
 
-            statistik[id]={
+    // Pakai tabel ranking yang sudah ada, tetapi otomatis mengikuti jenis absensi.
+    const slots=["rankingBerjamaah","rankingMasbuk","rankingTerlambat","rankingIzin","rankingAlpa","rankingMens"];
+    const statusKeys=currentActivity==="sholat"
+      ? ["berjamaah","masbuk","terlambat","izin","alpa","mens"]
+      : cfg.statuses.map(x=>x[0]);
+    const statusTitles=currentActivity==="sholat"
+      ? ["🕌 Berjamaah Terbanyak","🟡 Masbuk Terbanyak","🟠 Terlambat Terbanyak","🔵 Izin Terbanyak","🔴 Alpa Terbanyak","🟣 Mens/Udzur Terbanyak (Putri)"]
+      : cfg.statuses.map(x=>`${x[1]} ${x[2]} Terbanyak`);
 
-                nama:s.nama,
-
-                jenisKelamin:
-                s.jenisKelamin,
-
-                berjamaah:0,
-                masbuk:0,
-                terlambat:0,
-                izin:0,
-                alpa:0,
-                mens:0
-
-            };
-
+    slots.forEach((slot,i)=>{
+        const tbody=document.getElementById(slot);
+        const card=tbody?.closest('.card');
+        if(!tbody || !card) return;
+        if(i<statusKeys.length){
+            card.style.display="";
+            const h=card.querySelector('h3');
+            if(h) h.textContent=statusTitles[i];
+            tampilkanRanking(statistik,statusKeys[i],slot);
+        }else{
+            card.style.display="none";
         }
-    );
-
-
-    Object.entries(
-        absensiData||{}
-    )
-    .forEach(
-        ([tanggal,dataTanggal])=>{
-
-            if(
-                !tanggal.startsWith(
-                    `${tahun}-${bulan}`
-                )
-            )
-                return;
-
-
-            Object.values(
-                dataTanggal||{}
-            )
-            .forEach(
-                dataSholat=>{
-
-                    Object.entries(
-                        dataSholat||{}
-                    )
-                    .forEach(
-                        ([id,status])=>{
-
-                            if(
-                                statistik[id]
-                                &&
-                                statistik[id][status]
-                                !==undefined
-                            )
-                                statistik[id][status]++;
-
-                        }
-                    );
-
-                }
-            );
-
-        }
-    );
-
-
-    tampilkanRanking(
-        statistik,
-        "berjamaah",
-        "rankingBerjamaah"
-    );
-
-
-    tampilkanRanking(
-        statistik,
-        "masbuk",
-        "rankingMasbuk"
-    );
-
-
-    tampilkanRanking(
-        statistik,
-        "terlambat",
-        "rankingTerlambat"
-    );
-
-
-    tampilkanRanking(
-        statistik,
-        "izin",
-        "rankingIzin"
-    );
-
-
-    tampilkanRanking(
-        statistik,
-        "alpa",
-        "rankingAlpa"
-    );
-
-    tampilkanRanking(
-        statistik,
-        "mens",
-        "rankingMens"
-    );
-
+    });
 };
-
 
 function tampilkanRanking(
     statistik,
@@ -5018,7 +4901,7 @@ async function(){
         await remove(
             ref(
                 db,
-                "absensi"
+                activityPath()
             )
         );
 
@@ -5030,11 +4913,10 @@ async function(){
 
         loadDashboard();
 
-        renderStatistik();
-
-        renderStatistikBulanan();
-
-        jalankanRiset();
+        // Halaman berat dihitung hanya jika sedang dibuka.
+        if(document.getElementById("statistik")?.classList.contains("active")) renderStatistik();
+        if(document.getElementById("bulanan")?.classList.contains("active")) renderStatistikBulanan();
+        if(document.getElementById("riset")?.classList.contains("active")) jalankanRiset();
 
 
         showToast(
@@ -5282,9 +5164,447 @@ document
    START APP
 ========================================================= */
 
-loadAllData();
 
+window.chooseActivity = async function(key){
+  // Setiap jenis absensi selain Sholat memakai file HTML TERPISAH
+  // agar fungsi dan data tampilan tidak tercampur dalam index.html.
+  if(key === "mufrodat"){
+    window.location.href = "mufrodat.html";
+    return;
+  }
+  if(key === "muhadoroh"){
+    window.location.href = "muhadoroh.html";
+    return;
+  }
+  if(key === "muhadasah"){
+    window.location.href = "muhadasah.html";
+    return;
+  }
+
+  // Hanya Absensi Sholat yang berjalan di index.html
+  currentActivity="sholat";
+  localStorage.setItem("currentActivity","sholat");
+  document.getElementById("activityChooser").style.display="none";
+  applyActivityUI();
+  await loadAllData();
+};
+window.backToActivities = function(){ document.getElementById("activityChooser").style.display="flex"; };
+function applyActivityUI(){
+ const c=activityConfig[currentActivity];
+ const logo=document.querySelector(".logo h2"); if(logo) logo.textContent=c.title;
+ const absBtn=[...document.querySelectorAll('.menu button')].find(b=>b.textContent.includes('Absensi'));
+ if(absBtn) absBtn.innerHTML='<span>'+c.icon+'</span> '+c.title;
+ const prayerWrap=document.getElementById('sholatAbsensi')?.closest('.form-group');
+ if(prayerWrap) prayerWrap.style.display=currentActivity==='sholat'?'':'none';
+ const rekapBtn=[...document.querySelectorAll('.menu button')].find(b=>b.textContent.includes('Rekap 5 Waktu'));
+ if(rekapBtn) rekapBtn.style.display=currentActivity==='sholat'?'':'none';
+ const rekap=document.getElementById('rekap5'); if(rekap) rekap.style.display=currentActivity==='sholat'?'':'none';
+ const title=document.getElementById('topTitle'); if(title) title.textContent='Dashboard '+c.title.replace('Absensi ','');
+ const labels=currentActivity==='sholat'
+   ? {totalJamaah:'Berjamaah Hari Ini',dashJamaah:'Berjamaah',dashMasbuk:'Masbuk',dashTerlambat:'Telat',dashIzin:'Izin',dashAlpa:'Alpa',dashMens:'Mens'}
+   : {totalJamaah:'Hadir Hari Ini',dashJamaah:'Hadir',dashMasbuk:'',dashTerlambat: currentActivity==='mufrodat'?'':'Telat',dashIzin:'Izin',dashAlpa:'Alpa',dashMens: currentActivity==='mufrodat'?'':'Tidak Hafal'};
+ Object.entries(labels).forEach(([id,label])=>{
+   const el=document.getElementById(id); if(!el) return;
+   const card=el.closest('.stat-card')||el.parentElement?.parentElement;
+   if(card){ const p=card.querySelector('p'); if(p) p.textContent=label||'—'; card.style.display=label?'':'none'; }
+ });
+}
+
+
+document.getElementById("activityChooser").style.display="flex";
+applyActivityUI();
+
+
+/* ===== PERBAIKAN KHUSUS MUFRODAT ===== */
+function getActivityDayEntries(tanggal){
+  const d=absensiData?.[tanggal]||{};
+  const out=[];
+  const seen=new Set();
+
+  // Mendukung dua bentuk data:
+  // 1. Sholat: tanggal -> waktu sholat -> idSantri -> status
+  // 2. Aktivitas lain / data lama: tanggal -> idSantri -> status
+  Object.entries(d).forEach(([key,value])=>{
+    if(typeof value==="string"){
+      const token=`${key}|${value}`;
+      if(!seen.has(token)){ out.push({id:key,status:value}); seen.add(token); }
+      return;
+    }
+
+    if(!value || typeof value!=="object") return;
+    Object.entries(value).forEach(([id,status])=>{
+      if(typeof status!=="string") return;
+      const token=`${id}|${status}|${key}`;
+      if(!seen.has(token)){ out.push({id,status}); seen.add(token); }
+    });
+  });
+
+  return out;
+}
+
+window.renderStatistikBulanan=function(){
+  const bulan=document.getElementById("bulanStatistik")?.value;
+  const tahun=document.getElementById("tahunStatistik")?.value;
+  const cfg=activityConfig[currentActivity];
+  const statistik={};
+  Object.entries(santriData||{}).forEach(([id,santri])=>{
+    statistik[id]={nama:santri.nama,jenisKelamin:santri.jenisKelamin};
+    cfg.statuses.forEach(([key])=>statistik[id][key]=0);
+    if(currentActivity==="sholat" && santri.jenisKelamin==="Putri") statistik[id].mens=0;
+  });
+  Object.entries(absensiData||{}).forEach(([tanggal])=>{
+    if(!tanggal.startsWith(`${tahun}-${bulan}`)) return;
+    getActivityDayEntries(tanggal).forEach(({id,status})=>{
+      if(statistik[id] && Object.prototype.hasOwnProperty.call(statistik[id],status)) statistik[id][status]++;
+    });
+  });
+  const slots=["rankingBerjamaah","rankingMasbuk","rankingTerlambat","rankingIzin","rankingAlpa","rankingMens"];
+  const keys=currentActivity==="sholat"?["berjamaah","masbuk","terlambat","izin","alpa","mens"]:cfg.statuses.map(x=>x[0]);
+  const titles=currentActivity==="sholat"?["🕌 Berjamaah Terbanyak","🟡 Masbuk Terbanyak","🟠 Telat Terbanyak","🔵 Izin Terbanyak","🔴 Alpa Terbanyak","🟣 Mens/Udzur Terbanyak"]:cfg.statuses.map(x=>`${x[1]} ${x[2]} Terbanyak`);
+  slots.forEach((slot,i)=>{
+    const tbody=document.getElementById(slot), card=tbody?.closest('.card');
+    if(!tbody||!card) return;
+    if(i<keys.length){card.style.display=''; const h=card.querySelector('h3'); if(h)h.textContent=titles[i]; tampilkanRanking(statistik,keys[i],slot);}
+    else card.style.display='none';
+  });
+};
+
+function activityStatusLabel(status){
+  const found=activityConfig[currentActivity]?.statuses.find(x=>x[0]===status);
+  if(found) return `${found[1]} ${found[2]}`;
+  if(status==="mens") return "🟣 Mens";
+  return status;
+}
+
+window.jalankanRiset=function(){
+  const dari=document.getElementById("risetDari")?.value||"";
+  const sampai=document.getElementById("risetSampai")?.value||"";
+  const gender=document.getElementById("risetGender")?.value||"semua";
+  const statusFilter=document.getElementById("risetStatus")?.value||"semua";
+  const nama=(document.getElementById("risetNama")?.value||"").toLowerCase().trim();
+  const hasil=[];
+  Object.keys(absensiData||{}).forEach(tanggal=>{
+    if(dari&&tanggal<dari)return; if(sampai&&tanggal>sampai)return;
+    getActivityDayEntries(tanggal).forEach(({id,status})=>{
+      const santri=santriData[id]; if(!santri)return;
+      if(gender!=="semua"&&santri.jenisKelamin!==gender)return;
+      if(statusFilter!=="semua"&&status!==statusFilter)return;
+      if(nama&&!santri.nama.toLowerCase().includes(nama))return;
+      hasil.push({tanggal,kegiatan:activityConfig[currentActivity].title.replace("Absensi ",""),nama:santri.nama,jenis:santri.jenisKelamin,status});
+    });
+  });
+  hasil.sort((a,b)=>b.tanggal.localeCompare(a.tanggal)||a.nama.localeCompare(b.nama,"id"));
+  renderRisetHasil(hasil); renderRisetRekap(hasil); renderRisetSummary(hasil);
+};
+
+function renderActivityTodayNames(){
+  const old=document.getElementById('activityTodayNames'); if(old)old.remove();
+  if(currentActivity==='sholat') return;
+  const dash=document.getElementById('dashboard'); if(!dash)return;
+  const date=document.getElementById('dashboardDate')?.value||today();
+  const entries=getActivityDayEntries(date);
+  const groups={}; activityConfig[currentActivity].statuses.forEach(([k,ic,label])=>groups[k]={ic,label,names:[]});
+  entries.forEach(({id,status})=>{if(groups[status]&&santriData[id])groups[status].names.push(santriData[id].nama);});
+  const box=document.createElement('div'); box.id='activityTodayNames'; box.className='card'; box.style.marginTop='16px';
+  box.innerHTML=`<h3>📋 Absensi Hari Ini</h3><p style="color:#6b7280;margin:6px 0 12px">${date}</p>`+Object.entries(groups).map(([k,g])=>`<div style="margin:10px 0;padding:10px;border:1px solid #e5e7eb;border-radius:8px"><strong>${g.ic} ${g.label} (${g.names.length})</strong><div style="margin-top:7px;line-height:1.7">${g.names.length?g.names.map(n=>`• ${escapeHtml(n)}`).join('<br>'):'Belum ada data'}</div></div>`).join('');
+  dash.appendChild(box);
+}
+
+const __oldLoadDashboard=window.loadDashboard;
+window.loadDashboard=function(){ __oldLoadDashboard(); renderActivityTodayNames(); };
+
+const __oldApplyActivityUI=applyActivityUI;
+applyActivityUI=function(){
+  __oldApplyActivityUI();
+  const sholatFilter=document.getElementById('risetSholat');
+  const sholatWrap=sholatFilter?.closest('.form-group');
+  if(sholatWrap) sholatWrap.style.display=currentActivity==='sholat'?'':'none';
+  const statusSel=document.getElementById('risetStatus');
+  if(statusSel){statusSel.innerHTML='<option value="semua">Semua Status</option>'+activityConfig[currentActivity].statuses.map(x=>`<option value="${x[0]}">${x[1]} ${x[2]}</option>`).join('')+(currentActivity==='sholat'?'<option value="mens">🟣 Mens</option>':'');}
+};
+
+const __oldRenderRisetHasil=renderRisetHasil;
+renderRisetHasil=function(hasil){ __oldRenderRisetHasil(hasil); const tbody=document.getElementById('risetList'); if(!tbody)return; [...tbody.querySelectorAll('tr')].forEach((tr,i)=>{const item=hasil[i]; if(item){const tds=tr.querySelectorAll('td'); if(tds[1])tds[1].textContent=item.kegiatan; if(tds[4])tds[4].textContent=activityStatusLabel(item.status);}}); };
+
+
+
+/* =========================================================
+   PERBAIKAN FINAL AKTIVITAS NON-SHOLAT & RISET DATA
+========================================================= */
+
+function getCurrentActivityStatsTemplate(){
+  const stats={};
+  (activityConfig[currentActivity]?.statuses||[]).forEach(([key])=>stats[key]=0);
+  if(currentActivity==='sholat') stats.mens=0;
+  return stats;
+}
+
+function getActivityEntriesForSantri(id){
+  const entries=[];
+  Object.entries(absensiData||{}).forEach(([tanggal,dataTanggal])=>{
+    Object.values(dataTanggal||{}).forEach(group=>{
+      if(!group || typeof group!=='object') return;
+      const status=group[id];
+      if(typeof status==='string') entries.push({tanggal,status});
+    });
+  });
+  return entries;
+}
+
+function updateRisetTableHeaders(){
+  const resultTable=document.getElementById('risetList')?.closest('table');
+  if(resultTable){
+    const th=resultTable.querySelectorAll('thead th');
+    if(th[1]) th[1].textContent='Kegiatan';
+  }
+
+  const recapTable=document.getElementById('risetRekap')?.closest('table');
+  if(!recapTable) return;
+  const cfg=activityConfig[currentActivity];
+  const headers=['Nama',...cfg.statuses.map(x=>`${x[1]} ${x[2]}`),'Total'];
+  const thead=recapTable.querySelector('thead');
+  if(thead) thead.innerHTML='<tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr>';
+}
+
+function calculateSantriStatsActivity(id){
+  const stats=getCurrentActivityStatsTemplate();
+  getActivityEntriesForSantri(id).forEach(({status})=>{
+    if(Object.prototype.hasOwnProperty.call(stats,status)) stats[status]++;
+  });
+  return stats;
+}
+
+/* Statistik Santri dibuat mengikuti kegiatan aktif. */
+window.renderStatistik=function(){
+  const keyword=(document.getElementById('searchStatistik')?.value||'').toLowerCase().trim();
+  const container=document.getElementById('statistikResult');
+  if(!container) return;
+
+  if(!keyword){
+    container.innerHTML='<div class="card"><div style="text-align:center;padding:25px;color:#6b7280">🔎 Cari nama santri.</div></div>';
+    return;
+  }
+
+  const found=Object.entries(santriData||{}).filter(([,s])=>(s.nama||'').toLowerCase().includes(keyword));
+  if(!found.length){
+    container.innerHTML='<div class="card"><div style="text-align:center;padding:25px;color:#6b7280">Santri tidak ditemukan.</div></div>';
+    return;
+  }
+
+  const cfg=activityConfig[currentActivity];
+  container.innerHTML=found.map(([id,s])=>{
+    const stats=calculateSantriStatsActivity(id);
+    const total=Object.values(stats).reduce((a,b)=>a+b,0);
+    const primary=currentActivity==='sholat'?'berjamaah':'hadir';
+    const percent=total?Math.round((stats[primary]||0)/total*100):0;
+    const cards=cfg.statuses.map(([key,icon,label])=>`
+      <div class="detail-stat">
+        <strong>${stats[key]||0}</strong>
+        <small>${icon} ${label}</small>
+      </div>`).join('');
+    return `<div class="card">
+      <div class="profile">
+        <div class="avatar">${s.jenisKelamin==='Putra'?'👨':'👩'}</div>
+        <div><h3>${escapeHtml(s.nama)}</h3><span class="badge ${s.jenisKelamin==='Putra'?'badge-putra':'badge-putri'}">${s.jenisKelamin}</span></div>
+      </div>
+      <div class="detail-stats">${cards}</div>
+      <div style="margin-top:14px"><small>Total absensi tercatat: <strong>${total}</strong> · ${percent}% ${currentActivity==='sholat'?'berjamaah':'hadir'}</small></div>
+    </div>`;
+  }).join('');
+};
+
+/* Rekap Riset mengikuti status kegiatan aktif, bukan lagi khusus sholat. */
+window.renderRisetRekap=function(hasil){
+  const tbody=document.getElementById('risetRekap');
+  if(!tbody) return;
+  updateRisetTableHeaders();
+
+  const cfg=activityConfig[currentActivity];
+  const map={};
+  hasil.forEach(item=>{
+    if(!map[item.nama]){
+      map[item.nama]={nama:item.nama,jenis:item.jenis};
+      cfg.statuses.forEach(([key])=>map[item.nama][key]=0);
+    }
+    if(Object.prototype.hasOwnProperty.call(map[item.nama],item.status)) map[item.nama][item.status]++;
+  });
+
+  const data=Object.values(map).sort((a,b)=>{
+    const totalA=cfg.statuses.reduce((n,[key])=>n+(a[key]||0),0);
+    const totalB=cfg.statuses.reduce((n,[key])=>n+(b[key]||0),0);
+    return totalB-totalA || a.nama.localeCompare(b.nama,'id');
+  });
+
+  if(!data.length){
+    tbody.innerHTML=`<tr><td colspan="${cfg.statuses.length+2}" style="text-align:center;padding:25px;color:#6b7280">Belum ada data.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML=data.map(item=>{
+    const total=cfg.statuses.reduce((n,[key])=>n+(item[key]||0),0);
+    return `<tr><td><strong>${escapeHtml(item.nama)}</strong></td>`+
+      cfg.statuses.map(([key])=>`<td>${item[key]||0}</td>`).join('')+
+      `<td><strong>${total}</strong></td></tr>`;
+  }).join('');
+};
+
+/* Ringkasan Riset mengikuti status kegiatan aktif. */
+window.renderRisetSummary=function(hasil){
+  const container=document.getElementById('researchSummary');
+  if(!container) return;
+  const cfg=activityConfig[currentActivity];
+  const counts={};
+  cfg.statuses.forEach(([key])=>counts[key]=0);
+  hasil.forEach(item=>{
+    if(Object.prototype.hasOwnProperty.call(counts,item.status)) counts[item.status]++;
+  });
+  container.innerHTML=cfg.statuses.map(([key,icon,label])=>`
+    <div class="summary-box">
+      <strong>${counts[key]||0}</strong>
+      <small>${icon} ${label}</small>
+    </div>`).join('');
+};
+
+/* Pastikan judul tabel Riset langsung berubah saat pindah kegiatan. */
+const __patchedApplyActivityUI=applyActivityUI;
+applyActivityUI=function(){
+  __patchedApplyActivityUI();
+  updateRisetTableHeaders();
+};
+
+/* Saat data absensi baru disimpan, statistik halaman aktif langsung diperbarui. */
+const __patchedSetAbsensi=window.setAbsensi;
+window.setAbsensi=async function(id,status){
+  await __patchedSetAbsensi(id,status);
+  const activePage=document.querySelector('.page.active')?.id;
+  if(activePage==='statistik') window.renderStatistik();
+  if(activePage==='bulanan') window.renderStatistikBulanan();
+  if(activePage==='riset') window.jalankanRiset();
+};
+
+/* Jalankan penyesuaian awal. */
+updateRisetTableHeaders();
+
+
+
+
+/* =========================================================
+   PATCH FINAL RISET & DASHBOARD TANPA PERSENTASE
+========================================================= */
+(function(){
+  function readEntries(tanggal){
+    const result=[];
+    const hari=(absensiData||{})[tanggal]||{};
+    Object.values(hari).forEach(group=>{
+      if(!group || typeof group!=="object") return;
+      Object.entries(group).forEach(([id,status])=>{
+        if(typeof status==="string") result.push({id,status});
+      });
+    });
+    return result;
+  }
+
+  window.renderRisetSummary=function(hasil){
+    const container=document.getElementById("researchSummary");
+    if(!container) return;
+    const cfg=activityConfig[currentActivity];
+    const counts={};
+    cfg.statuses.forEach(([key])=>counts[key]=0);
+    (hasil||[]).forEach(item=>{
+      if(Object.prototype.hasOwnProperty.call(counts,item.status)) counts[item.status]++;
+    });
+    container.innerHTML=cfg.statuses.map(([key,icon,label])=>
+      `<div class="summary-box"><strong>${counts[key]||0}</strong><small>${icon} ${label}</small></div>`
+    ).join("");
+  };
+
+  window.renderRisetRekap=function(hasil){
+    const tbody=document.getElementById("risetRekap");
+    if(!tbody) return;
+    const cfg=activityConfig[currentActivity];
+    const table=tbody.closest("table");
+    const thead=table?.querySelector("thead");
+    if(thead) thead.innerHTML="<tr>"+["Nama",...cfg.statuses.map(x=>`${x[1]} ${x[2]}`),"Total"].map(x=>`<th>${x}</th>`).join("")+"</tr>";
+    const map={};
+    (hasil||[]).forEach(item=>{
+      if(!map[item.nama]){
+        map[item.nama]={nama:item.nama};
+        cfg.statuses.forEach(([key])=>map[item.nama][key]=0);
+      }
+      if(Object.prototype.hasOwnProperty.call(map[item.nama],item.status)) map[item.nama][item.status]++;
+    });
+    const rows=Object.values(map);
+    if(!rows.length){
+      tbody.innerHTML=`<tr><td colspan="${cfg.statuses.length+2}" style="text-align:center;padding:25px;color:#6b7280">Belum ada data.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML=rows.map(row=>{
+      const total=cfg.statuses.reduce((n,[key])=>n+(row[key]||0),0);
+      return `<tr><td><strong>${escapeHtml(row.nama)}</strong></td>`+
+        cfg.statuses.map(([key])=>`<td>${row[key]||0}</td>`).join("")+`<td><strong>${total}</strong></td></tr>`;
+    }).join("");
+  };
+
+  window.renderRisetHasil=function(hasil){
+    const tbody=document.getElementById("risetList");
+    const jumlah=document.getElementById("risetJumlah");
+    if(!tbody) return;
+    if(jumlah) jumlah.textContent=`${hasil.length} data`;
+    if(!hasil.length){
+      tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:25px;color:#6b7280">Tidak ada data sesuai filter.</td></tr>';
+      return;
+    }
+    tbody.innerHTML=hasil.map(item=>`<tr>
+      <td>${formatTanggal(item.tanggal)}</td>
+      <td>${item.kegiatan}</td>
+      <td><strong>${escapeHtml(item.nama)}</strong></td>
+      <td>${item.jenis}</td>
+      <td>${activityStatusLabel(item.status)}</td>
+    </tr>`).join("");
+  };
+
+  window.jalankanRiset=function(){
+    const dari=document.getElementById("risetDari")?.value||"";
+    const sampai=document.getElementById("risetSampai")?.value||"";
+    const gender=document.getElementById("risetGender")?.value||"semua";
+    const statusFilter=document.getElementById("risetStatus")?.value||"semua";
+    const nama=(document.getElementById("risetNama")?.value||"").trim().toLowerCase();
+    const hasil=[];
+    Object.keys(absensiData||{}).forEach(tanggal=>{
+      if(dari && tanggal<dari) return;
+      if(sampai && tanggal>sampai) return;
+      readEntries(tanggal).forEach(({id,status})=>{
+        const santri=(santriData||{})[id];
+        if(!santri) return;
+        if(gender!=="semua" && santri.jenisKelamin!==gender) return;
+        if(statusFilter!=="semua" && status!==statusFilter) return;
+        if(nama && !(santri.nama||"").toLowerCase().includes(nama)) return;
+        hasil.push({
+          tanggal,
+          kegiatan:(activityConfig[currentActivity]?.title||"").replace("Absensi ",""),
+          nama:santri.nama,
+          jenis:santri.jenisKelamin,
+          status
+        });
+      });
+    });
+    hasil.sort((a,b)=>b.tanggal.localeCompare(a.tanggal)||a.nama.localeCompare(b.nama,"id"));
+    window.renderRisetHasil(hasil);
+    window.renderRisetRekap(hasil);
+    window.renderRisetSummary(hasil);
+  };
+
+  // Dashboard: pastikan tabel Absensi Hari Ini hanya Status dan Jumlah.
+  const dailyTable=document.getElementById("dashJamaah")?.closest("table");
+  if(dailyTable){
+    const head=dailyTable.querySelector("thead tr");
+    if(head && head.children.length>2) head.removeChild(head.lastElementChild);
+    dailyTable.querySelectorAll("tbody tr").forEach(row=>{
+      while(row.children.length>2) row.removeChild(row.lastElementChild);
+    });
+  }
+})();
 </script>
 
 </body>
-</html>
+</html>  
