@@ -2565,28 +2565,25 @@ from
 const firebaseConfig = {
 
     apiKey:
-    "AIzaSyDqi8CPibuJQJbeU0I7Ji3283Q5g-Zjbo0",
+    "AIzaSyACmoTX0k8UT33XVq6V_s4sMQGWrkL2ioM",
 
     authDomain:
-    "absen-c458c.firebaseapp.com",
-
-    databaseURL:
-    "https://absen-c458c-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "absensholat-60a4f.firebaseapp.com",
 
     projectId:
-    "absen-c458c",
+    "absensholat-60a4f",
 
     storageBucket:
-    "absen-c458c.firebasestorage.app",
+    "absensholat-60a4f.firebasestorage.app",
 
     messagingSenderId:
-    "6019525143",
+    "330833791751",
 
     appId:
-    "1:6019525143:web:832773386ac201edbc4a52",
+    "1:330833791751:web:8ffa12bdc5a096de9313a2",
 
     measurementId:
-    "G-5R4RHFVY2D"
+    "G-QX9RGBTPJZ"
 
 };
 
@@ -2595,8 +2592,10 @@ const app =
     initializeApp(firebaseConfig);
 
 
-const db =
-    getDatabase(app);
+const db = getDatabase(
+    app,
+    "https://absensholat-60a4f-default-rtdb.asia-southeast1.firebasedatabase.app"
+);
 
 
 
